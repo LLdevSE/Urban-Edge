@@ -22,11 +22,13 @@ const propertyRoutes = require('./routes/propertyRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const inquiryRoutes = require('./routes/inquiryRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 app.use('/api/properties', propertyRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {

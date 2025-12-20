@@ -32,4 +32,9 @@ export const inquiryService = {
   getAll: () => api.get('/inquiries'),
 };
 
+export const userService = {
+  getAll: () => api.get('/users'),
+  delete: (id: string) => api.delete(`/users/${id}`),
+};
+
 export default api;

@@ -9,6 +9,7 @@ const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('properties');
   const [properties, setProperties] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,11 +25,25 @@ const AdminDashboard: React.FC = () => {
       } else if (activeTab === 'inquiries') {
         const res = await inquiryService.getAll();
         setInquiries(res.data);
+      } else if (activeTab === 'users') {
+        const res = await userService.getAll();
+        setUsers(res.data);
       }
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        await userService.delete(id);
+        setUsers(users.filter(u => u._id !== id));
+      } catch (error) {
+        alert('Failed to delete user');
+      }
     }
   };
 
@@ -56,6 +71,13 @@ const AdminDashboard: React.FC = () => {
             <Users size={20} />
             Inquiries
           </button>
+          <button 
+            onClick={() => setActiveTab('users')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'users' ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+          >
+            <Users size={20} />
+            Customers
+          </button>
         </nav>
 
         <div className="p-4 border-t border-gray-100">
@@ -82,7 +104,7 @@ const AdminDashboard: React.FC = () => {
       <main className="flex-grow p-8 overflow-y-auto h-screen">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold font-montserrat text-textDark">
-            {activeTab === 'properties' ? 'Property Management' : 'Lead Inquiries'}
+            {activeTab === 'properties' ? 'Property Management' : activeTab === 'inquiries' ? 'Lead Inquiries' : 'Customer Management'}
           </h1>
           {activeTab === 'properties' && (
             <button className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20">
@@ -134,7 +156,7 @@ const AdminDashboard: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-            ) : (
+            ) : activeTab === 'inquiries' ? (
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
@@ -160,6 +182,54 @@ const AdminDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-6 text-gray-600 text-sm max-w-xs truncate">{inquiry.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">User</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Email</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Role</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Joined</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {users.map((u) => (
+                    <tr key={u._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="p-6">
+                        <div className="flex items-center gap-3">
+                          {u.avatar ? (
+                            <img src={u.avatar} alt="" className="w-10 h-10 rounded-full" />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600">
+                              {u.name ? u.name[0] : u.email[0]}
+                            </div>
+                          )}
+                          <span className="font-bold text-textDark">{u.name || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="p-6 text-gray-600">{u.email}</td>
+                      <td className="p-6">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="p-6 text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
+                      <td className="p-6 text-right">
+                        {u.role !== 'admin' && (
+                          <button 
+                            onClick={() => handleDeleteUser(u._id)}
+                            className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                            title="Delete User"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
