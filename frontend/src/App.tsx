@@ -20,7 +20,7 @@ import { AuthProvider } from './hooks/useAuth';
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID_HERE">
+    <GoogleOAuthProvider clientId="232020880038-7lttujdnm22glmd4quvps3qnmalqp45l.apps.googleusercontent.com">
       <Router>
         <AuthProvider>
           <ScrollToTop />
