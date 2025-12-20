@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #1E4C7A;
+  --color-cta: #FF7F00;
+  --color-light-gray: #F5F7FA;
+  --color-text-dark: #1A1A1A;
+  --font-montserrat: Montserrat, ui-sans-serif, system-ui, sans-serif;
+  --font-opensans: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
 @layer base {
   body {
     @apply font-opensans text-textDark bg-background;
