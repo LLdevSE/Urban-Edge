@@ -1,7 +1,35 @@
-import React from 'react';
-import { Mail, Phone, MapPin, Clock, Facebook, Instagram, Twitter } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, Phone, MapPin, Clock, Facebook, Instagram, Twitter, Loader2, CheckCircle2 } from 'lucide-react';
+import { inquiryService } from '../services/api';
 
 const Contact: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: `${formData.get('firstName')} ${formData.get('lastName')}`,
+      email: formData.get('email'),
+      phone: 'Not Provided', // Contact form usually doesn't force phone, but backend requires it? Let's check model.
+      message: `Subject: ${formData.get('subject')} - ${formData.get('message')}`,
+      type: 'General'
+    };
+
+    try {
+      await inquiryService.create(data);
+      setSuccess(true);
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white">
       {/* Contact Hero */}
@@ -86,38 +114,55 @@ const Contact: React.FC = () => {
             {/* Contact Form */}
             <div className="bg-white p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100">
               <h2 className="text-3xl font-bold mb-8">Send a Message</h2>
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-400 uppercase">First Name</label>
-                    <input type="text" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all" />
+              {success ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <CheckCircle2 size={64} className="text-green-500 mb-6" />
+                  <h3 className="text-2xl font-bold mb-2">Message Sent!</h3>
+                  <p className="text-gray-500 mb-8">Thank you for contacting us. We will get back to you shortly.</p>
+                  <button 
+                    onClick={() => setSuccess(false)}
+                    className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors"
+                  >
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase">First Name</label>
+                      <input name="firstName" type="text" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase">Last Name</label>
+                      <input name="lastName" type="text" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all" />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Last Name</label>
-                    <input type="text" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all" />
+                    <label className="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                    <input name="email" type="email" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all" />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase">Email Address</label>
-                  <input type="email" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase">Subject</label>
-                  <select className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all">
-                    <option>General Inquiry</option>
-                    <option>Property Question</option>
-                    <option>Selling Land</option>
-                    <option>Legal Verification</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase">Message</label>
-                  <textarea className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl h-40 focus:ring-2 focus:ring-cta focus:outline-none transition-all" placeholder="How can we help you?"></textarea>
-                </div>
-                <button className="w-full bg-primary text-white font-bold py-5 rounded-xl hover:bg-slate-800 transition-all shadow-lg text-lg">
-                  Send Message
-                </button>
-              </form>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Subject</label>
+                    <select name="subject" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none transition-all">
+                      <option>General Inquiry</option>
+                      <option>Property Question</option>
+                      <option>Selling Land</option>
+                      <option>Legal Verification</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Message</label>
+                    <textarea name="message" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl h-40 focus:ring-2 focus:ring-cta focus:outline-none transition-all" placeholder="How can we help you?"></textarea>
+                  </div>
+                  <button 
+                    disabled={loading}
+                    className="w-full bg-primary text-white font-bold py-5 rounded-xl hover:bg-slate-800 transition-all shadow-lg text-lg flex items-center justify-center gap-2"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={24} /> : 'Send Message'}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
