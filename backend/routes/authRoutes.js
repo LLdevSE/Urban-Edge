@@ -4,6 +4,8 @@ const authController = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/login', authController.loginUser);
-router.post('/register', authController.registerAdmin); // NOTE: Ideally protect this or disable in production
+router.post('/google', authController.googleLogin);
+router.post('/register-user', authController.registerUser);
+router.post('/register', authController.registerAdmin); // Admin only
 
 module.exports = router;

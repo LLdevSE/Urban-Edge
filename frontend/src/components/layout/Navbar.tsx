@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Phone } from 'lucide-react';
+import { Menu, X, Phone, User as UserIcon, LogOut } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isAuthenticated, logout, openModal } = useAuth();
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -35,6 +37,37 @@ const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                   {user.avatar ? (
+                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full" />
+                   ) : (
+                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                       <UserIcon size={16} />
+                     </div>
+                   )}
+                   <span className="font-bold text-sm text-primary truncate max-w-[100px]">{user.name || user.email}</span>
+                </div>
+                <button 
+                  onClick={logout}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut size={20} />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={openModal}
+                className="text-primary font-bold hover:text-cta transition-colors flex items-center gap-2"
+              >
+                <UserIcon size={18} />
+                Login
+              </button>
+            )}
+
             <Link
               to="/contact"
               className="bg-cta text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
@@ -45,7 +78,10 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-4">
+            {!isAuthenticated && (
+               <button onClick={openModal} className="text-primary font-bold">Login</button>
+            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-textDark hover:text-primary focus:outline-none"
@@ -70,6 +106,11 @@ const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+            {isAuthenticated && (
+              <button onClick={logout} className="block w-full text-left px-3 py-2 text-red-500 font-medium">
+                Sign Out ({user.name || user.email})
+              </button>
+            )}
             <Link
               to="/contact"
               className="block px-3 py-2 bg-cta text-white rounded-md font-semibold text-center mt-4"
