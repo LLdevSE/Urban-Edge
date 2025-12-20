@@ -3,7 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
+import api from '../../services/api';
 
 const AuthModal: React.FC = () => {
   const { isModalOpen, closeModal, login } = useAuth();
