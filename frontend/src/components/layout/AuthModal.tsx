@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
