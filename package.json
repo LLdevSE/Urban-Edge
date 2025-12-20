@@ -1,0 +1,12 @@
+{
+  "name": "urban-edge-root",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "postinstall": "cd backend && npm install"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
