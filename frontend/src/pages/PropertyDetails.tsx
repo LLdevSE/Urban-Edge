@@ -1,26 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Maximize, Phone, Mail, Calendar, Info, Share2, Heart } from 'lucide-react';
+import { MapPin, Maximize, Phone, Mail, Calendar, Info, Share2, Heart, Loader2, CheckCircle2 } from 'lucide-react';
+import { propertyService, inquiryService } from '../services/api';
 
 const PropertyDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [property, setProperty] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [formLoading, setFormLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Mock data for a single property
-  const property = {
-    id: id,
-    title: 'Emerald Gardens - Gampaha',
-    location: 'Gampaha Town, Western Province',
-    price: 4500000,
-    size: 10,
-    type: 'Residential Land',
-    status: 'Available',
-    description: 'This prime land is ideally located with easy access to main roads, utilities, and essential services. Suitable for residential or investment purposes. Just 5 minutes from Gampaha town center and 10 minutes to the highway entrance.',
-    images: [
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    ],
-    features: ['Clear Deeds', 'Electricity', 'Water Supply', 'Wide Roads', 'Security Provided']
+  useEffect(() => {
+    const fetchProperty = async () => {
+      if (!id) return;
+      try {
+        const response = await propertyService.getById(id);
+        setProperty(response.data);
+      } catch (error) {
+        console.error('Error fetching property:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperty();
+  }, [id]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      message: formData.get('message'),
+      propertyId: id,
+      type: 'Buy'
+    };
+
+    try {
+      await inquiryService.create(data);
+      setSuccess(true);
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      console.error('Error sending inquiry:', error);
+      alert('Failed to send inquiry. Please try again.');
+    } finally {
+      setFormLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={64} />
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold mb-4">Property not found</h2>
+        <Link to="/properties" className="text-primary hover:underline">Back to listings</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-lightGray min-h-screen pb-20">
@@ -112,15 +157,32 @@ const PropertyDetails: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white p-8 rounded-3xl shadow-lg sticky top-32">
               <h3 className="text-2xl font-bold mb-6">Inquire About This Land</h3>
-              <form className="space-y-4">
-                <input type="text" placeholder="Your Name" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-cta transition-all" />
-                <input type="email" placeholder="Your Email" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-cta transition-all" />
-                <input type="tel" placeholder="Phone Number" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-cta transition-all" />
-                <textarea placeholder="I'm interested in this property..." className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl h-32 focus:outline-none focus:ring-2 focus:ring-cta transition-all"></textarea>
-                <button className="w-full bg-cta text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20">
-                  Send Inquiry
-                </button>
-              </form>
+              {success ? (
+                <div className="bg-green-50 text-green-700 p-6 rounded-2xl text-center">
+                  <CheckCircle2 className="mx-auto mb-4" size={48} />
+                  <h4 className="font-bold text-xl mb-2">Inquiry Sent!</h4>
+                  <p>Our team will contact you shortly.</p>
+                  <button 
+                    onClick={() => setSuccess(false)}
+                    className="mt-4 text-sm font-bold underline"
+                  >
+                    Send another message
+                  </button>
+                </div>
+              ) : (
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                  <input name="name" type="text" placeholder="Your Name" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-cta transition-all" />
+                  <input name="email" type="email" placeholder="Your Email" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-cta transition-all" />
+                  <input name="phone" type="tel" placeholder="Phone Number" required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-cta transition-all" />
+                  <textarea name="message" placeholder="I'm interested in this property..." required className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl h-32 focus:outline-none focus:ring-2 focus:ring-cta transition-all"></textarea>
+                  <button 
+                    disabled={formLoading}
+                    className="w-full bg-cta text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {formLoading ? <Loader2 className="animate-spin" size={20} /> : 'Send Inquiry'}
+                  </button>
+                </form>
+              )}
 
               <div className="mt-8 pt-8 border-t border-gray-100 flex items-center justify-between">
                 <div>

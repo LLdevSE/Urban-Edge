@@ -1,48 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropertyCard from '../components/ui/PropertyCard';
-import { Filter, Search, SlidersHorizontal } from 'lucide-react';
-
-const mockProperties = [
-  {
-    id: '1',
-    title: 'Emerald Gardens - Gampaha',
-    location: 'Gampaha Town',
-    price: 4500000,
-    size: 10,
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    type: 'Land'
-  },
-  {
-    id: '2',
-    title: 'Silver Line Residency',
-    location: 'Kottawa',
-    price: 8200000,
-    size: 6.5,
-    image: 'https://images.unsplash.com/photo-1449156003053-c3d8c0f11273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    type: 'Land'
-  },
-  {
-    id: '3',
-    title: 'Pine Hills Development',
-    location: 'Kandy',
-    price: 3500000,
-    size: 15,
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    type: 'Land'
-  },
-  {
-    id: '4',
-    title: 'Coastal Breeze Blocks',
-    location: 'Negombo',
-    price: 6000000,
-    size: 8,
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    type: 'Land'
-  }
-];
+import { Filter, Search, SlidersHorizontal, Loader2 } from 'lucide-react';
+import { propertyService } from '../services/api';
 
 const Properties: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await propertyService.getAll();
+        setProperties(response.data);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperties();
+  }, []);
+
+  const filteredProperties = properties.filter(p => 
+    p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="bg-lightGray min-h-screen pt-12 pb-24">
@@ -89,22 +72,40 @@ const Properties: React.FC = () => {
         </div>
 
         {/* Results Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockProperties.map((prop) => (
-            <PropertyCard key={prop.id} {...prop} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-primary" size={48} />
+          </div>
+        ) : filteredProperties.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProperties.map((prop) => (
+              <PropertyCard 
+                key={prop._id} 
+                id={prop._id}
+                title={prop.title}
+                location={prop.location}
+                price={prop.price}
+                size={prop.size}
+                image={prop.images[0]}
+                type={prop.type}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+            <p className="text-gray-400 text-xl font-medium">No properties found matching your criteria.</p>
+          </div>
+        )}
 
         {/* Pagination Placeholder */}
-        <div className="mt-16 flex justify-center">
-          <nav className="flex items-center gap-2">
-            <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-white transition-colors">1</button>
-            <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-white transition-colors">2</button>
-            <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-white transition-colors">3</button>
-            <span className="px-2 text-gray-400">...</span>
-            <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-white transition-colors">12</button>
-          </nav>
-        </div>
+        {!loading && filteredProperties.length > 0 && (
+          <div className="mt-16 flex justify-center">
+            <nav className="flex items-center gap-2">
+              <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-white transition-colors">1</button>
+              <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-white transition-colors text-gray-400" disabled>2</button>
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );

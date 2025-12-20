@@ -19,8 +19,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/urbanedge
 
 // Routes
 const propertyRoutes = require('./routes/propertyRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const inquiryRoutes = require('./routes/inquiryRoutes');
 
 app.use('/api/properties', propertyRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/inquiries', inquiryRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {

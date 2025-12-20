@@ -41,6 +41,30 @@ const properties = [
   }
 ];
 
+const projects = [
+  {
+    name: 'Victoria Heights',
+    location: 'Kandy',
+    description: 'A premium block development overlooking the Mahaweli River, featuring 24 luxury plots with full infrastructure.',
+    mainImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    status: 'Ongoing',
+    blocks: [
+      { blockNumber: 'A1', size: 10, price: 5000000, status: 'Available' },
+      { blockNumber: 'A2', size: 12, price: 6000000, status: 'Sold' }
+    ]
+  },
+  {
+    name: 'Metro Link Residency',
+    location: 'Malabe',
+    description: 'Modern urban living with excellent connectivity. Just 2 minutes to the SLIIT campus and expressway.',
+    mainImage: 'https://images.unsplash.com/photo-1590001158193-79cd7c986f7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    status: 'Ongoing',
+    blocks: [
+      { blockNumber: 'B1', size: 6, price: 4000000, status: 'Available' }
+    ]
+  }
+];
+
 const seedDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/urbanedge');
@@ -48,6 +72,9 @@ const seedDB = async () => {
     
     await Property.deleteMany({});
     await Property.insertMany(properties);
+
+    await Project.deleteMany({});
+    await Project.insertMany(projects);
     
     console.log('Database Seeded Successfully');
     process.exit();

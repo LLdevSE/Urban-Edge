@@ -1,40 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, CheckCircle } from 'lucide-react';
-
+import { Search, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import PropertyCard from '../components/ui/PropertyCard';
+import { propertyService } from '../services/api';
 
 const Home: React.FC = () => {
-  const featuredProperties = [
-    {
-      id: '1',
-      title: 'Emerald Gardens - Gampaha',
-      location: 'Gampaha Town',
-      price: 4500000,
-      size: 10,
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      type: 'Land'
-    },
-    {
-      id: '2',
-      title: 'Silver Line Residency',
-      location: 'Kottawa',
-      price: 8200000,
-      size: 6.5,
-      image: 'https://images.unsplash.com/photo-1449156003053-c3d8c0f11273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      type: 'Land'
-    },
-    {
-      id: '3',
-      title: 'Pine Hills Development',
-      location: 'Kandy',
-      price: 3500000,
-      size: 15,
-      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      type: 'Land'
-    }
-  ];
+  const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const response = await propertyService.getAll();
+        // Just take the first 3 for featured on home
+        setFeaturedProperties(response.data.slice(0, 3));
+      } catch (error) {
+        console.error('Error fetching featured properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   return (
     <div className="overflow-x-hidden">
@@ -140,9 +128,26 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProperties.map((prop) => (
-              <PropertyCard key={prop.id} {...prop} />
-            ))}
+            {loading ? (
+              <div className="col-span-full flex justify-center py-12">
+                <Loader2 className="animate-spin text-primary" size={40} />
+              </div>
+            ) : featuredProperties.length > 0 ? (
+              featuredProperties.map((prop) => (
+                <PropertyCard 
+                  key={prop._id} 
+                  id={prop._id}
+                  title={prop.title}
+                  location={prop.location}
+                  price={prop.price}
+                  size={prop.size}
+                  image={prop.images[0]}
+                  type={prop.type}
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-gray-500 italic">No featured properties at the moment.</p>
+            )}
           </div>
         </div>
       </section>
