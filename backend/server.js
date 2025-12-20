@@ -21,10 +21,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/urbanedge
 const propertyRoutes = require('./routes/propertyRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const inquiryRoutes = require('./routes/inquiryRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/properties', propertyRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/inquiries', inquiryRoutes);
+app.use('/api/auth', authRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
