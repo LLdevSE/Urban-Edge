@@ -5,6 +5,8 @@ import { propertyService } from '../services/api';
 
 const Properties: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [district, setDistrict] = useState('');
+  const [priceRange, setPriceRange] = useState('');
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,10 +24,19 @@ const Properties: React.FC = () => {
     fetchProperties();
   }, []);
 
-  const filteredProperties = properties.filter(p => 
-    p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProperties = properties.filter(p => {
+    const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         p.location.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesDistrict = district === '' || p.location.toLowerCase().includes(district.toLowerCase());
+    
+    let matchesPrice = true;
+    if (priceRange === '0-5') matchesPrice = p.price <= 5000000;
+    else if (priceRange === '5-10') matchesPrice = p.price > 5000000 && p.price <= 10000000;
+    else if (priceRange === '10+') matchesPrice = p.price > 10000000;
+
+    return matchesSearch && matchesDistrict && matchesPrice;
+  });
 
   return (
     <div className="bg-lightGray min-h-screen pt-12 pb-24">
@@ -50,23 +61,36 @@ const Properties: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4 flex-wrap">
-            <select className="bg-gray-50 border border-gray-100 p-3 rounded-xl focus:outline-none min-w-[150px]">
+            <select 
+              className="bg-gray-50 border border-gray-100 p-3 rounded-xl focus:outline-none min-w-[150px]"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+            >
               <option value="">All Districts</option>
               <option value="colombo">Colombo</option>
               <option value="gampaha">Gampaha</option>
               <option value="kandy">Kandy</option>
+              <option value="negombo">Negombo</option>
+              <option value="kurunegala">Kurunegala</option>
             </select>
 
-            <select className="bg-gray-50 border border-gray-100 p-3 rounded-xl focus:outline-none min-w-[150px]">
+            <select 
+              className="bg-gray-50 border border-gray-100 p-3 rounded-xl focus:outline-none min-w-[150px]"
+              value={priceRange}
+              onChange={(e) => setPriceRange(e.target.value)}
+            >
               <option value="">Price Range</option>
               <option value="0-5">Below 5M</option>
               <option value="5-10">5M - 10M</option>
               <option value="10+">Above 10M</option>
             </select>
 
-            <button className="flex items-center gap-2 bg-textDark text-white px-6 py-3 rounded-xl hover:bg-black transition-colors font-semibold">
+            <button 
+              onClick={() => {setSearchTerm(''); setDistrict(''); setPriceRange('');}}
+              className="flex items-center gap-2 bg-textDark text-white px-6 py-3 rounded-xl hover:bg-black transition-colors font-semibold"
+            >
               <SlidersHorizontal size={18} />
-              More Filters
+              Reset
             </button>
           </div>
         </div>
