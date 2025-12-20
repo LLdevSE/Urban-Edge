@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { LayoutDashboard, Building2, Users, LogOut, Plus, Trash2, Search } from 'lucide-react';
-import { propertyService, inquiryService } from '../services/api';
-import { Link } from 'react-router-dom';
+import { Building2, Users, LogOut, Plus, Trash2 } from 'lucide-react';
+import { propertyService, inquiryService, userService } from '../services/api';
 
 const AdminDashboard: React.FC = () => {
   const { logout, user } = useAuth();

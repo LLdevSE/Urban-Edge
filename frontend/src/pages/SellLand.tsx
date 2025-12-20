@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Upload, CheckCircle2, MapPin, Send, ArrowRight, Loader2 } from 'lucide-react';
 import { inquiryService } from '../services/api';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Maximize, Phone, Mail, Calendar, Info, Share2, Heart, Loader2, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Info, Share2, Heart, Loader2, CheckCircle2 } from 'lucide-react';
 import { propertyService, inquiryService } from '../services/api';
 
 const PropertyDetails: React.FC = () => {
@@ -141,7 +141,7 @@ const PropertyDetails: React.FC = () => {
             <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm">
               <h3 className="text-2xl font-bold mb-8">Key Features</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {property.features.map((feature, idx) => (
+                {property.features.map((feature: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
                     <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
                       <CheckCircle2 className="text-green-500" size={20} />

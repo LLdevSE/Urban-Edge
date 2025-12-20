@@ -89,14 +89,14 @@ const About: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: "Integrity", desc: "Honesty in every deal and clear documentation.", icon: <ShieldCheck className="text-primary" /> },
-              { title: "Transparency", desc: "No hidden costs or legal surprises.", icon: <Eye className="text-primary" /> },
-              { title: "Quality", desc: "Superior land prep and infrastructure.", icon: <Target className="text-primary" /> },
-              { title: "Customer First", desc: "Dedicated support throughout the journey.", icon: <Users className="text-primary" /> }
+              { title: "Integrity", desc: "Honesty in every deal and clear documentation.", icon: ShieldCheck },
+              { title: "Transparency", desc: "No hidden costs or legal surprises.", icon: Eye },
+              { title: "Quality", desc: "Superior land prep and infrastructure.", icon: Target },
+              { title: "Customer First", desc: "Dedicated support throughout the journey.", icon: Users }
             ].map((value, idx) => (
               <div key={idx} className="text-center p-8">
                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
-                  {React.cloneElement(value.icon as React.ReactElement, { size: 32 })}
+                  <value.icon size={32} />
                 </div>
                 <h4 className="text-xl font-bold mb-3">{value.title}</h4>
                 <p className="text-gray-500">{value.desc}</p>

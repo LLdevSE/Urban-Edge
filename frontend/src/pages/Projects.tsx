@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, MapPin, CheckCircle2, ArrowRight, Loader2 } from 'lucide-react';
+import { LayoutGrid, MapPin, ArrowRight, Loader2 } from 'lucide-react';
 import { projectService } from '../services/api';
 
 const Projects: React.FC = () => {

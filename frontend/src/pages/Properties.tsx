@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropertyCard from '../components/ui/PropertyCard';
-import { Filter, Search, SlidersHorizontal, Loader2 } from 'lucide-react';
+import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { propertyService } from '../services/api';
 
 const Properties: React.FC = () => {
