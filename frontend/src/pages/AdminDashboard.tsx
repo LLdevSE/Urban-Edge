@@ -10,6 +10,12 @@ const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Add Property State
+  const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+  const [newProperty, setNewProperty] = useState({
+    title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: ['']
+  });
 
   useEffect(() => {
     fetchData();
@@ -106,7 +112,10 @@ const AdminDashboard: React.FC = () => {
             {activeTab === 'properties' ? 'Property Management' : activeTab === 'inquiries' ? 'Lead Inquiries' : 'Customer Management'}
           </h1>
           {activeTab === 'properties' && (
-            <button className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20">
+            <button 
+              onClick={() => setIsPropertyModalOpen(true)}
+              className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20"
+            >
               <Plus size={20} />
               Add New Property
             </button>
@@ -237,6 +246,133 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Add Property Modal */}
+      {isPropertyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-300">
+            <button 
+              onClick={() => setIsPropertyModalOpen(false)}
+              className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors z-10"
+            >
+              <LogOut size={20} className="rotate-180" /> 
+            </button>
+            
+            <div className="p-8">
+              <h2 className="text-2xl font-bold font-montserrat text-primary mb-6">Add New Property</h2>
+              
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  await propertyService.create(newProperty);
+                  setIsPropertyModalOpen(false);
+                  fetchData(); // Refresh list
+                  setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
+                } catch (error) {
+                  alert('Failed to create property');
+                }
+              }} className="space-y-4">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Title</label>
+                    <input 
+                      required 
+                      value={newProperty.title}
+                      onChange={(e) => setNewProperty({...newProperty, title: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Price (LKR)</label>
+                    <input 
+                      type="number" 
+                      required 
+                      value={newProperty.price}
+                      onChange={(e) => setNewProperty({...newProperty, price: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-400 uppercase">Description</label>
+                  <textarea 
+                    required 
+                    rows={3}
+                    value={newProperty.description}
+                    onChange={(e) => setNewProperty({...newProperty, description: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Location</label>
+                    <input 
+                      required 
+                      value={newProperty.location}
+                      onChange={(e) => setNewProperty({...newProperty, location: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Size (Perches)</label>
+                    <input 
+                      type="number" 
+                      required 
+                      value={newProperty.size}
+                      onChange={(e) => setNewProperty({...newProperty, size: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Type</label>
+                    <select 
+                      value={newProperty.type}
+                      onChange={(e) => setNewProperty({...newProperty, type: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none"
+                    >
+                      <option value="Land">Land</option>
+                      <option value="Residential">Residential</option>
+                      <option value="Commercial">Commercial</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Status</label>
+                    <select 
+                      value={newProperty.status}
+                      onChange={(e) => setNewProperty({...newProperty, status: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none"
+                    >
+                      <option value="Available">Available</option>
+                      <option value="Sold">Sold</option>
+                      <option value="Reserved">Reserved</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-400 uppercase">Image URL</label>
+                  <input 
+                    value={newProperty.images[0]}
+                    onChange={(e) => setNewProperty({...newProperty, images: [e.target.value]})}
+                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+
+                <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
+                  Create Property
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
