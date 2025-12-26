@@ -2,7 +2,7 @@
   "name": "urban-edge-root",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install && npm run build"
+    "build": "npm run build --workspace=frontend"
   },
   "workspaces": [
     "frontend",

@@ -4,15 +4,11 @@
     { "source": "/api/(.*)", "destination": "/backend/server.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "builds": [
-    {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "frontend/dist" }
+  "functions": {
+    "backend/server.js": {
+      "maxDuration": 10
     }
-  ]
+  },
+  "buildCommand": "npm run build --workspace=frontend",
+  "outputDirectory": "frontend/dist"
 }
