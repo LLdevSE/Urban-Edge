@@ -16,27 +16,19 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB Connection
-let isConnected = false;
-
 const connectToDatabase = async () => {
-  if (isConnected) {
-    return;
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/urbanedge');
-    isConnected = db.connections[0].readyState;
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB Connected');
   } catch (err) {
     console.error('MongoDB Connection Error:', err);
+    process.exit(1); // Exit process with failure
   }
 };
-
-// Connect to DB for every request (Serverless optimization)
-app.use(async (req, res, next) => {
-  await connectToDatabase();
-  next();
-});
 
 // Routes
 const propertyRoutes = require('./routes/propertyRoutes');
@@ -56,13 +48,16 @@ app.get('/', (req, res) => {
   res.send('Urban Edge API is running...');
 });
 
-// Start Server Only if not in Vercel
-if (require.main === module) {
-  connectToDatabase().then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+// Start Server
+const startServer = async () => {
+  await connectToDatabase();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
+};
+
+if (require.main === module) {
+  startServer();
 }
 
 module.exports = app;
