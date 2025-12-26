@@ -143,7 +143,6 @@ const AuthModal: React.FC = () => {
                 onSuccess={handleGoogleSuccess}
                 onError={() => setError('Google Login Failed')}
                 shape="circle"
-                width="100%"
               />
           </div>
 
