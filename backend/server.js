@@ -30,6 +30,12 @@ const connectToDatabase = async () => {
   }
 };
 
+// Connect to DB for every request (Serverless optimization)
+app.use(async (req, res, next) => {
+  await connectToDatabase();
+  next();
+});
+
 // Routes
 const propertyRoutes = require('./routes/propertyRoutes');
 const projectRoutes = require('./routes/projectRoutes');
