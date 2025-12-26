@@ -49,6 +49,30 @@ app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
+// Temporary Route to Seed Admin
+const User = require('./models/User');
+app.get('/api/setup-admin', async (req, res) => {
+  try {
+    const adminEmail = 'admin@urbanedge.lk';
+    const adminPassword = 'admin123';
+
+    const userExists = await User.findOne({ email: adminEmail });
+    if (userExists) {
+      return res.status(400).json({ message: 'Admin user already exists' });
+    }
+
+    const user = await User.create({
+      email: adminEmail,
+      password: adminPassword,
+      role: 'admin'
+    });
+
+    res.status(201).json({ message: 'Admin created successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Basic Route
 app.get('/', (req, res) => {
   res.send('Urban Edge API is running...');
