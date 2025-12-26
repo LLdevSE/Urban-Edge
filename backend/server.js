@@ -51,6 +51,10 @@ app.use('/api/users', userRoutes);
 
 // Temporary Route to Seed Admin
 const User = require('./models/User');
+const Property = require('./models/Property');
+const Project = require('./models/Project');
+const { properties, projects } = require('./seedData');
+
 app.get('/api/setup-admin', async (req, res) => {
   try {
     const adminEmail = 'admin@urbanedge.lk';
@@ -70,6 +74,20 @@ app.get('/api/setup-admin', async (req, res) => {
     res.status(201).json({ message: 'Admin created successfully', user });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/api/seed-db', async (req, res) => {
+  try {
+    await Property.deleteMany({});
+    await Property.insertMany(properties);
+
+    await Project.deleteMany({});
+    await Project.insertMany(projects);
+
+    res.status(201).json({ message: 'Database Seeded Successfully with Properties and Projects' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error seeding database', error: error.message });
   }
 });
 
