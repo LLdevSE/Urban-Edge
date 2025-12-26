@@ -18,22 +18,34 @@ app.use(express.json());
 // MongoDB Connection
 const connectToDatabase = async () => {
   if (!process.env.MONGODB_URI) {
+    console.error('CRITICAL ERROR: MONGODB_URI is not defined in environment variables.');
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
   }
 
   try {
+    // Check if we have an active connection
+    if (mongoose.connection.readyState >= 1) {
+      return;
+    }
+
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('MongoDB Connected');
+    console.log('MongoDB Connected Successfully');
   } catch (err) {
     console.error('MongoDB Connection Error:', err);
-    process.exit(1); // Exit process with failure
+    // Do NOT exit process in serverless; just throw the error so the request fails gracefully-ish
+    throw err;
   }
 };
 
 // Connect to DB for every request (Serverless optimization)
 app.use(async (req, res, next) => {
-  await connectToDatabase();
-  next();
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    console.error('Database middleware connection failure:', error);
+    res.status(500).json({ message: 'Database connection failed', error: error.message });
+  }
 });
 
 // Routes
