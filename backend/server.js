@@ -72,12 +72,18 @@ app.get('/api/setup-admin', async (req, res) => {
     const adminEmail = 'admin@urbanedge.lk';
     const adminPassword = 'admin123';
 
-    const userExists = await User.findOne({ email: adminEmail });
-    if (userExists) {
-      return res.status(400).json({ message: 'Admin user already exists' });
+    let user = await User.findOne({ email: adminEmail });
+    
+    if (user) {
+      console.log('Admin found, resetting password...');
+      user.password = adminPassword;
+      await user.save();
+      console.log('Admin password reset complete.');
+      return res.status(200).json({ message: 'Admin password reset successfully', user });
     }
 
-    const user = await User.create({
+    console.log('Creating new admin...');
+    user = await User.create({
       email: adminEmail,
       password: adminPassword,
       role: 'admin'
@@ -85,6 +91,7 @@ app.get('/api/setup-admin', async (req, res) => {
 
     res.status(201).json({ message: 'Admin created successfully', user });
   } catch (error) {
+    console.error('Error setting up admin:', error);
     res.status(500).json({ message: error.message });
   }
 });
