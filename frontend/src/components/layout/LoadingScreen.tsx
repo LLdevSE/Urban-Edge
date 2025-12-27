@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -19,18 +19,18 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
     return () => clearTimeout(timer);
   }, [onComplete]);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     initial: { opacity: 1 },
     exit: { 
       y: "-100%",
       transition: { 
         duration: 0.8, 
-        ease: [0.76, 0, 0.24, 1] // Custom bezier for smooth slide up
+        ease: [0.76, 0, 0.24, 1]
       }
     }
   };
 
-  const wordVariants = {
+  const wordVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -41,7 +41,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
     }
   };
 
-  const letterVariants = {
+  const letterVariants: Variants = {
     hidden: { y: 100, opacity: 0 },
     visible: {
       y: 0,
