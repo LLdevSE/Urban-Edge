@@ -255,30 +255,30 @@ const AdminDashboard = () => {
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Property</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Location</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Price</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Status</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Property</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase hidden md:table-cell">Location</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Price</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Status</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {properties.map((prop) => (
                     <tr key={prop._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-6">
+                      <td className="p-3 md:p-6">
                         <div className="flex items-center gap-4">
                           <img src={prop.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" />
                           <span className="font-bold text-textDark">{prop.title}</span>
                         </div>
                       </td>
-                      <td className="p-6 text-gray-600">{prop.location}</td>
-                      <td className="p-6 font-bold">Rs. {(prop.price / 100000).toFixed(1)}M</td>
-                      <td className="p-6">
+                      <td className="p-3 md:p-6 text-gray-600 hidden md:table-cell">{prop.location}</td>
+                      <td className="p-3 md:p-6 font-bold">Rs. {(prop.price / 100000).toFixed(1)}M</td>
+                      <td className="p-3 md:p-6">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${prop.status === 'Available' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                           {prop.status}
                         </span>
                       </td>
-                      <td className="p-6 text-right">
+                      <td className="p-3 md:p-6 text-right">
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => handleEditProperty(prop)}
@@ -302,30 +302,30 @@ const AdminDashboard = () => {
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Project Name</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Location</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Status</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Total Blocks</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Project Name</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase hidden md:table-cell">Location</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Status</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Total Blocks</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {projects.map((proj) => (
                     <tr key={proj._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-6">
+                      <td className="p-3 md:p-6">
                         <div className="flex items-center gap-4">
                           <img src={proj.mainImage} alt="" className="w-12 h-12 rounded-lg object-cover" />
                           <span className="font-bold text-textDark">{proj.name}</span>
                         </div>
                       </td>
-                      <td className="p-6 text-gray-600">{proj.location}</td>
-                      <td className="p-6">
+                      <td className="p-3 md:p-6 text-gray-600 hidden md:table-cell">{proj.location}</td>
+                      <td className="p-3 md:p-6">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${proj.status === 'Ongoing' ? 'bg-blue-100 text-blue-700' : proj.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                           {proj.status}
                         </span>
                       </td>
-                      <td className="p-6 text-gray-600">{proj.blocks?.length || 0}</td>
-                      <td className="p-6 text-right">
+                      <td className="p-3 md:p-6 text-gray-600">{proj.blocks?.length || 0}</td>
+                      <td className="p-3 md:p-6 text-right">
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => handleEditProject(proj)}
@@ -349,28 +349,28 @@ const AdminDashboard = () => {
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Date</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Name</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Contact</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Type</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Message</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Date</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Name</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Contact</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Type</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Message</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {inquiries.map((inquiry) => (
                     <tr key={inquiry._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-6 text-gray-500 text-sm">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
-                      <td className="p-6 font-bold text-textDark">{inquiry.name}</td>
-                      <td className="p-6">
+                      <td className="p-3 md:p-6 text-gray-500 text-sm">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
+                      <td className="p-3 md:p-6 font-bold text-textDark">{inquiry.name}</td>
+                      <td className="p-3 md:p-6">
                         <p className="text-sm">{inquiry.email}</p>
                         <p className="text-sm text-gray-500">{inquiry.phone}</p>
                       </td>
-                      <td className="p-6">
+                      <td className="p-3 md:p-6">
                         <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase">
                           {inquiry.type}
                         </span>
                       </td>
-                      <td className="p-6 text-gray-600 text-sm max-w-xs truncate">{inquiry.message}</td>
+                      <td className="p-3 md:p-6 text-gray-600 text-sm max-w-xs truncate">{inquiry.message}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -379,17 +379,17 @@ const AdminDashboard = () => {
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">User</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Email</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Role</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Joined</th>
-                    <th className="p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">User</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Email</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase">Role</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase hidden md:table-cell">Joined</th>
+                    <th className="p-3 md:p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {users.map((u) => (
                     <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-6">
+                      <td className="p-3 md:p-6">
                         <div className="flex items-center gap-3">
                           {u.avatar ? (
                             <img src={u.avatar} alt="" className="w-10 h-10 rounded-full" />
@@ -401,14 +401,14 @@ const AdminDashboard = () => {
                           <span className="font-bold text-textDark">{u.name || 'N/A'}</span>
                         </div>
                       </td>
-                      <td className="p-6 text-gray-600">{u.email}</td>
-                      <td className="p-6">
+                      <td className="p-3 md:p-6 text-gray-600">{u.email}</td>
+                      <td className="p-3 md:p-6">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
                           {u.role}
                         </span>
                       </td>
-                      <td className="p-6 text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
-                      <td className="p-6 text-right">
+                      <td className="p-3 md:p-6 text-gray-500 hidden md:table-cell">{new Date(u.createdAt).toLocaleDateString()}</td>
+                      <td className="p-3 md:p-6 text-right">
                         {u.role !== 'admin' && (
                           <button 
                             onClick={() => handleDeleteUser(u._id)}
