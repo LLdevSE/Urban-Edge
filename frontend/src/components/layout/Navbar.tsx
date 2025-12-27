@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Phone, User as UserIcon, LogOut } from 'lucide-react';
+import { Menu, X, Phone, User as UserIcon, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 const Navbar: React.FC = () => {
@@ -40,6 +40,15 @@ const Navbar: React.FC = () => {
             
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
+                {user?.role === 'admin' && (
+                  <Link 
+                    to="/admin" 
+                    className="flex items-center gap-1 text-primary hover:text-cta font-bold text-sm transition-colors border border-primary/20 px-3 py-1.5 rounded-lg"
+                  >
+                    <LayoutDashboard size={16} />
+                    Admin
+                  </Link>
+                )}
                 <div className="flex items-center gap-2">
                    {user.avatar ? (
                      <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full" />
@@ -107,9 +116,21 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
             {isAuthenticated && (
-              <button onClick={logout} className="block w-full text-left px-3 py-2 text-red-500 font-medium">
-                Sign Out ({user.name || user.email})
-              </button>
+              <>
+                {user?.role === 'admin' && (
+                  <Link 
+                    to="/admin" 
+                    className="block px-3 py-2 text-primary font-bold flex items-center gap-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <LayoutDashboard size={18} />
+                    Admin Dashboard
+                  </Link>
+                )}
+                <button onClick={logout} className="block w-full text-left px-3 py-2 text-red-500 font-medium">
+                  Sign Out ({user.name || user.email})
+                </button>
+              </>
             )}
             <Link
               to="/contact"
