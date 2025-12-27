@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropertyCard from '../components/ui/PropertyCard';
 import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { propertyService } from '../services/api';

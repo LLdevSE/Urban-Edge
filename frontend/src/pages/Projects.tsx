@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LayoutGrid, MapPin, ArrowRight, Loader2, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { projectService } from '../services/api';

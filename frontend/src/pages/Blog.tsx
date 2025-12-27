@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 const Blog = () => {
