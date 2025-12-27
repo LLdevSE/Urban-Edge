@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -19,8 +20,21 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/uploads', express.static('/tmp/uploads'));
+
+// Explicit route for serving uploads (more reliable in serverless)
+app.get('/uploads/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const localPath = path.join(__dirname, 'uploads', filename);
+  const tmpPath = path.join('/tmp/uploads', filename);
+
+  if (fs.existsSync(localPath)) {
+    return res.sendFile(localPath);
+  } else if (fs.existsSync(tmpPath)) {
+    return res.sendFile(tmpPath);
+  } else {
+    res.status(404).send('File not found');
+  }
+});
 
 app.get('/api/health-check', (req, res) => {
   res.json({
