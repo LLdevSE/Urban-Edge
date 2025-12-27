@@ -11,6 +11,7 @@ const AdminDashboard = () => {
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Property State
@@ -464,6 +465,7 @@ const AdminDashboard = () => {
               
               <form onSubmit={async (e) => {
                 e.preventDefault();
+                setIsSubmitting(true);
                 try {
                   const formData = new FormData();
                   formData.append('title', newProperty.title);
@@ -498,6 +500,8 @@ const AdminDashboard = () => {
                 } catch (error) {
                   console.error(error);
                   alert(editingId ? 'Failed to update property' : 'Failed to create property');
+                } finally {
+                  setIsSubmitting(false);
                 }
               }} className="space-y-4">
                 
@@ -660,8 +664,11 @@ const AdminDashboard = () => {
                   )}
                 </div>
 
-                <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
-                  {editingId ? 'Update Property' : 'Create Property'}
+                <button 
+                  disabled={isSubmitting}
+                  className={`w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  {isSubmitting ? 'Processing...' : (editingId ? 'Update Property' : 'Create Property')}
                 </button>
               </form>
             </div>
@@ -687,6 +694,7 @@ const AdminDashboard = () => {
               
               <form onSubmit={async (e) => {
                 e.preventDefault();
+                setIsSubmitting(true);
                 try {
                   const formData = new FormData();
                   formData.append('name', newProject.name);
@@ -710,6 +718,8 @@ const AdminDashboard = () => {
                 } catch (error) {
                   console.error(error);
                   alert(editingProjectId ? 'Failed to update project' : 'Failed to create project');
+                } finally {
+                  setIsSubmitting(false);
                 }
               }} className="space-y-4">
                 
@@ -813,8 +823,11 @@ const AdminDashboard = () => {
                   )}
                 </div>
 
-                <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
-                  {editingProjectId ? 'Update Project' : 'Create Project'}
+                <button 
+                  disabled={isSubmitting}
+                  className={`w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  {isSubmitting ? 'Processing...' : (editingProjectId ? 'Update Project' : 'Create Project')}
                 </button>
               </form>
             </div>
