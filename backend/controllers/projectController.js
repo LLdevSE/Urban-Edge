@@ -20,8 +20,23 @@ exports.getProjectById = async (req, res) => {
 };
 
 exports.createProject = async (req, res) => {
-  const project = new Project(req.body);
   try {
+    const projectData = { ...req.body };
+    
+    if (req.file) {
+      projectData.mainImage = req.file.path.replace(/\\/g, '/');
+    }
+    
+    if (typeof projectData.blocks === 'string') {
+      try {
+        projectData.blocks = JSON.parse(projectData.blocks);
+      } catch (e) {
+        // If parsing fails, it might be better to throw error or handle gracefully
+        console.error('Error parsing blocks:', e);
+      }
+    }
+
+    const project = new Project(projectData);
     const newProject = await project.save();
     res.status(201).json(newProject);
   } catch (err) {
@@ -31,7 +46,21 @@ exports.createProject = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = { ...req.body };
+    
+    if (req.file) {
+      updateData.mainImage = req.file.path.replace(/\\/g, '/');
+    }
+    
+    if (typeof updateData.blocks === 'string') {
+      try {
+        updateData.blocks = JSON.parse(updateData.blocks);
+      } catch (e) {
+        console.error('Error parsing blocks:', e);
+      }
+    }
+
+    const project = await Project.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!project) return res.status(404).json({ message: 'Project not found' });
     res.json(project);
   } catch (err) {
