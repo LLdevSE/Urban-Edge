@@ -19,6 +19,7 @@ const AdminDashboard = () => {
   const [newProperty, setNewProperty] = useState({
     title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: ['']
   });
+  const [selectedPropertyFiles, setSelectedPropertyFiles] = useState<FileList | null>(null);
 
   // Project State
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -26,6 +27,7 @@ const AdminDashboard = () => {
   const [newProject, setNewProject] = useState({
     name: '', location: '', description: '', mainImage: '', status: 'Upcoming'
   });
+  const [selectedProjectFile, setSelectedProjectFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -86,8 +88,9 @@ const AdminDashboard = () => {
       size: property.size,
       type: property.type,
       status: property.status,
-      images: property.images.length > 0 ? property.images : ['']
+      images: property.images.length > 0 ? property.images : []
     });
+    setSelectedPropertyFiles(null);
     setIsPropertyModalOpen(true);
   };
 
@@ -95,6 +98,7 @@ const AdminDashboard = () => {
     setIsPropertyModalOpen(false);
     setEditingId(null);
     setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
+    setSelectedPropertyFiles(null);
   };
 
   const handleDeleteProject = async (id: string) => {
@@ -117,6 +121,7 @@ const AdminDashboard = () => {
       mainImage: project.mainImage,
       status: project.status
     });
+    setSelectedProjectFile(null);
     setIsProjectModalOpen(true);
   };
 
@@ -124,6 +129,7 @@ const AdminDashboard = () => {
     setIsProjectModalOpen(false);
     setEditingProjectId(null);
     setNewProject({ name: '', location: '', description: '', mainImage: '', status: 'Upcoming' });
+    setSelectedProjectFile(null);
   };
 
   return (
@@ -222,6 +228,7 @@ const AdminDashboard = () => {
               onClick={() => {
                 setEditingId(null);
                 setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
+                setSelectedPropertyFiles(null);
                 setIsPropertyModalOpen(true);
               }}
               className="bg-cta text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20 text-sm md:text-base w-full md:w-auto justify-center"
@@ -235,6 +242,7 @@ const AdminDashboard = () => {
               onClick={() => {
                 setEditingProjectId(null);
                 setNewProject({ name: '', location: '', description: '', mainImage: '', status: 'Upcoming' });
+                setSelectedProjectFile(null);
                 setIsProjectModalOpen(true);
               }}
               className="bg-cta text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20 text-sm md:text-base w-full md:w-auto justify-center"
@@ -267,7 +275,11 @@ const AdminDashboard = () => {
                     <tr key={prop._id} className="hover:bg-gray-50 transition-colors">
                       <td className="p-3 md:p-6">
                         <div className="flex items-center gap-4">
-                          <img src={prop.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                          <img 
+                            src={prop.images[0]?.startsWith('http') ? prop.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${prop.images[0]}`} 
+                            alt="" 
+                            className="w-12 h-12 rounded-lg object-cover" 
+                          />
                           <span className="font-bold text-textDark">{prop.title}</span>
                         </div>
                       </td>
@@ -314,7 +326,11 @@ const AdminDashboard = () => {
                     <tr key={proj._id} className="hover:bg-gray-50 transition-colors">
                       <td className="p-3 md:p-6">
                         <div className="flex items-center gap-4">
-                          <img src={proj.mainImage} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                          <img 
+                            src={proj.mainImage?.startsWith('http') ? proj.mainImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${proj.mainImage}`}
+                            alt="" 
+                            className="w-12 h-12 rounded-lg object-cover" 
+                          />
                           <span className="font-bold text-textDark">{proj.name}</span>
                         </div>
                       </td>
@@ -447,14 +463,38 @@ const AdminDashboard = () => {
               <form onSubmit={async (e) => {
                 e.preventDefault();
                 try {
+                  const formData = new FormData();
+                  formData.append('title', newProperty.title);
+                  formData.append('description', newProperty.description);
+                  formData.append('price', newProperty.price);
+                  formData.append('location', newProperty.location);
+                  formData.append('size', newProperty.size);
+                  formData.append('type', newProperty.type);
+                  formData.append('status', newProperty.status);
+                  
+                  // Append existing images (if any remain)
+                  if (newProperty.images && newProperty.images.length > 0) {
+                    newProperty.images.forEach(img => {
+                       if (typeof img === 'string' && img.length > 0) formData.append('images', img);
+                    });
+                  }
+
+                  // Append new files
+                  if (selectedPropertyFiles) {
+                    Array.from(selectedPropertyFiles).forEach(file => {
+                      formData.append('images', file);
+                    });
+                  }
+
                   if (editingId) {
-                    await propertyService.update(editingId, newProperty);
+                    await propertyService.update(editingId, formData);
                   } else {
-                    await propertyService.create(newProperty);
+                    await propertyService.create(formData);
                   }
                   closePropertyModal();
                   fetchData(); // Refresh list
                 } catch (error) {
+                  console.error(error);
                   alert(editingId ? 'Failed to update property' : 'Failed to create property');
                 }
               }} className="space-y-4">
@@ -542,13 +582,38 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase">Image URL</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase">Property Images</label>
                   <input 
-                    value={newProperty.images[0]}
-                    onChange={(e) => setNewProperty({...newProperty, images: [e.target.value]})}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => setSelectedPropertyFiles(e.target.files)}
                     className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
-                    placeholder="https://example.com/image.jpg"
                   />
+                  {/* Preview existing images if editing */}
+                  {newProperty.images && newProperty.images.length > 0 && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {newProperty.images.map((img, idx) => (
+                        img && <div key={idx} className="relative">
+                            <img 
+                                src={img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${img}`} 
+                                alt="Preview" 
+                                className="w-16 h-16 object-cover rounded-lg" 
+                            />
+                            <button 
+                                type="button"
+                                onClick={() => {
+                                    const updatedImages = newProperty.images.filter((_, i) => i !== idx);
+                                    setNewProperty({...newProperty, images: updatedImages});
+                                }}
+                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5"
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
@@ -579,14 +644,27 @@ const AdminDashboard = () => {
               <form onSubmit={async (e) => {
                 e.preventDefault();
                 try {
+                  const formData = new FormData();
+                  formData.append('name', newProject.name);
+                  formData.append('location', newProject.location);
+                  formData.append('description', newProject.description);
+                  formData.append('status', newProject.status);
+                  
+                  if (selectedProjectFile) {
+                    formData.append('mainImage', selectedProjectFile);
+                  } else if (newProject.mainImage) {
+                    formData.append('mainImage', newProject.mainImage);
+                  }
+
                   if (editingProjectId) {
-                    await projectService.update(editingProjectId, newProject);
+                    await projectService.update(editingProjectId, formData);
                   } else {
-                    await projectService.create(newProject);
+                    await projectService.create(formData);
                   }
                   closeProjectModal();
                   fetchData(); // Refresh list
                 } catch (error) {
+                  console.error(error);
                   alert(editingProjectId ? 'Failed to update project' : 'Failed to create project');
                 }
               }} className="space-y-4">
@@ -637,13 +715,23 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase">Main Image URL</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase">Main Project Image</label>
                   <input 
-                    value={newProject.mainImage}
-                    onChange={(e) => setNewProject({...newProject, mainImage: e.target.value})}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setSelectedProjectFile(e.target.files ? e.target.files[0] : null)}
                     className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
-                    placeholder="https://example.com/project-image.jpg"
                   />
+                  {newProject.mainImage && !selectedProjectFile && (
+                      <div className="mt-2">
+                          <p className="text-xs text-gray-400 mb-1">Current Image:</p>
+                          <img 
+                            src={newProject.mainImage.startsWith('http') ? newProject.mainImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${newProject.mainImage}`}
+                            alt="Current" 
+                            className="w-20 h-20 object-cover rounded-lg" 
+                          />
+                      </div>
+                  )}
                 </div>
 
                 <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
