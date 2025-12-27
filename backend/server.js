@@ -22,6 +22,18 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.get('/api/health-check', (req, res) => {
+  res.json({
+    status: 'ok',
+    environment: {
+      MONGODB_URI: !!process.env.MONGODB_URI,
+      JWT_SECRET: !!process.env.JWT_SECRET,
+      GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // MongoDB Connection
 const connectToDatabase = async () => {
   if (!process.env.MONGODB_URI) {
@@ -124,18 +136,6 @@ app.get('/api/seed-db', async (req, res) => {
 // Basic Route
 app.get('/', (req, res) => {
   res.send('Urban Edge API is running...');
-});
-
-app.get('/api/health-check', (req, res) => {
-  res.json({
-    status: 'ok',
-    environment: {
-      MONGODB_URI: !!process.env.MONGODB_URI,
-      JWT_SECRET: !!process.env.JWT_SECRET,
-      GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID
-    },
-    timestamp: new Date().toISOString()
-  });
 });
 
 // Start Server
