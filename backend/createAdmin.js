@@ -13,21 +13,23 @@ const createAdmin = async () => {
     const adminPassword = 'admin123';
 
     // Check if admin exists
-    const userExists = await User.findOne({ email: adminEmail });
+    let user = await User.findOne({ email: adminEmail });
 
-    if (userExists) {
-      console.log('Admin user already exists');
-      process.exit();
+    if (user) {
+      console.log('Admin user found. Resetting password...');
+      user.password = adminPassword;
+      await user.save();
+      console.log('Admin password reset successfully.');
+    } else {
+      // Create Admin
+      user = await User.create({
+        email: adminEmail,
+        password: adminPassword,
+        role: 'admin'
+      });
+      console.log('Admin User Created Successfully!');
     }
 
-    // Create Admin
-    const user = await User.create({
-      email: adminEmail,
-      password: adminPassword,
-      role: 'admin'
-    });
-
-    console.log('Admin User Created Successfully!');
     console.log('--------------------------------');
     console.log(`Email: ${adminEmail}`);
     console.log(`Password: ${adminPassword}`);
