@@ -279,7 +279,7 @@ const AdminDashboard = () => {
                       <td className="p-3 md:p-6">
                         <div className="flex items-center gap-4">
                           <img 
-                            src={prop.images[0]?.startsWith('http') ? prop.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${prop.images[0]}`} 
+                            src={prop.images[0]?.startsWith('http') ? prop.images[0] : `/${prop.images[0]}`} 
                             alt="" 
                             className="w-12 h-12 rounded-lg object-cover" 
                           />
@@ -330,7 +330,7 @@ const AdminDashboard = () => {
                       <td className="p-3 md:p-6">
                         <div className="flex items-center gap-4">
                           <img 
-                            src={proj.mainImage?.startsWith('http') ? proj.mainImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${proj.mainImage}`}
+                            src={proj.mainImage?.startsWith('http') ? proj.mainImage : `/${proj.mainImage}`}
                             alt="" 
                             className="w-12 h-12 rounded-lg object-cover" 
                           />
@@ -655,7 +655,7 @@ const AdminDashboard = () => {
                         {newProperty.images.map((img, idx) => (
                             img && <div key={idx} className="relative group">
                                 <img 
-                                    src={img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${img}`} 
+                                    src={img.startsWith('http') ? img : `/${img}`} 
                                     alt="Preview" 
                                     className="w-20 h-20 object-cover rounded-lg border border-gray-200" 
                                 />
@@ -834,7 +834,7 @@ const AdminDashboard = () => {
                       <div className="mt-4">
                           <p className="text-xs font-bold text-gray-400 uppercase mb-2">Current Image</p>
                           <img 
-                            src={newProject.mainImage.startsWith('http') ? newProject.mainImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${newProject.mainImage}`}
+                            src={newProject.mainImage.startsWith('http') ? newProject.mainImage : `/${newProject.mainImage}`}
                             alt="Current" 
                             className="w-24 h-24 object-cover rounded-xl border border-gray-200" 
                           />
