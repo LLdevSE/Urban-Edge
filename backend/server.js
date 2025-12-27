@@ -20,6 +20,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static('/tmp/uploads'));
 
 app.get('/api/health-check', (req, res) => {
   res.json({

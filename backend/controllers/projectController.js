@@ -24,7 +24,7 @@ exports.createProject = async (req, res) => {
     const projectData = { ...req.body };
     
     if (req.file) {
-      projectData.mainImage = req.file.path.replace(/\\/g, '/');
+      projectData.mainImage = 'uploads/' + path.basename(req.file.path);
     }
     
     if (typeof projectData.blocks === 'string') {
@@ -49,7 +49,7 @@ exports.updateProject = async (req, res) => {
     const updateData = { ...req.body };
     
     if (req.file) {
-      updateData.mainImage = req.file.path.replace(/\\/g, '/');
+      updateData.mainImage = 'uploads/' + path.basename(req.file.path);
     }
     
     if (typeof updateData.blocks === 'string') {

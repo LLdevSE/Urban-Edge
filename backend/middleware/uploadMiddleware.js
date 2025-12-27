@@ -2,14 +2,15 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure upload directory exists
-let uploadDir = 'uploads/';
+// Determine upload directory (Vercel uses /tmp)
+let uploadDir = (process.env.VERCEL || process.env.NODE_ENV === 'production') ? '/tmp/uploads/' : 'uploads/';
+
 try {
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 } catch (err) {
-  console.warn('Failed to create local uploads directory (likely read-only FS). Falling back to /tmp/uploads.');
+  console.warn(`Failed to create directory ${uploadDir}, falling back to /tmp/uploads/`);
   uploadDir = '/tmp/uploads/';
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -22,7 +23,6 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // Create unique filename: fieldname-timestamp-random.ext
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
@@ -41,7 +41,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 4 * 1024 * 1024 // 4MB limit per file (Vercel total limit is 4.5MB)
   }
 });
 
