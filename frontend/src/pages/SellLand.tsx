@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, CheckCircle2, MapPin, Send, ArrowRight, Loader2 } from 'lucide-react';
 import { inquiryService } from '../services/api';
 
-const SellLand: React.FC = () => {
+const SellLand = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 

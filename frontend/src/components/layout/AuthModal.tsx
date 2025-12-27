@@ -5,7 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
-const AuthModal: React.FC = () => {
+const AuthModal = () => {
   const { isModalOpen, closeModal, login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);

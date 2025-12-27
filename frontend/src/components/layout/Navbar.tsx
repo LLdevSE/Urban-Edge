@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Menu, X, Phone, User as UserIcon, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout, openModal } = useAuth();
 

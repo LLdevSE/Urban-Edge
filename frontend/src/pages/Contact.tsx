@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Facebook, Instagram, Twitter, Loader2, CheckCircle2 } from 'lucide-react';
 import { inquiryService } from '../services/api';
 
-const Contact: React.FC = () => {
+const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 

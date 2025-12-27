@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Loader2, Lock, Mail } from 'lucide-react';
 import api from '../services/api';
 
-const Login: React.FC = () => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

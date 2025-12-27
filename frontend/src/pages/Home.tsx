@@ -5,7 +5,7 @@ import { Search, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import PropertyCard from '../components/ui/PropertyCard';
 import { propertyService } from '../services/api';
 
-const Home: React.FC = () => {
+const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 

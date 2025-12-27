@@ -1,7 +1,7 @@
 import React from 'react';
 import { Target, Eye, ShieldCheck, Users } from 'lucide-react';
 
-const About: React.FC = () => {
+const About = () => {
   return (
     <div className="bg-white">
       {/* About Hero */}

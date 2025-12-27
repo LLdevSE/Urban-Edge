@@ -3,7 +3,7 @@ import { LayoutGrid, MapPin, ArrowRight, Loader2, Search, Filter } from 'lucide-
 import { Link } from 'react-router-dom';
 import { projectService } from '../services/api';
 
-const Projects: React.FC = () => {
+const Projects = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

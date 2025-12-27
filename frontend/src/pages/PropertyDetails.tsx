@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Info, Share2, Heart, Loader2, CheckCircle2 } from 'lucide-react';
 import { propertyService, inquiryService } from '../services/api';
 
-const PropertyDetails: React.FC = () => {
+const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);

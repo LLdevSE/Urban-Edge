@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
-const Blog: React.FC = () => {
+const Blog = () => {
   const posts = [
     {
       id: 1,

@@ -6,7 +6,7 @@ interface LoadingScreenProps {
   onComplete: () => void;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
+const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {

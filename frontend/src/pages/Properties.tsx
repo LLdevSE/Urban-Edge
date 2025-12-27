@@ -3,7 +3,7 @@ import PropertyCard from '../components/ui/PropertyCard';
 import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { propertyService } from '../services/api';
 
-const Properties: React.FC = () => {
+const Properties = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [district, setDistrict] = useState('');
   const [priceRange, setPriceRange] = useState('');

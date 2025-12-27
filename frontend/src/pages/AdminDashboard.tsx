@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Building2, Users, LogOut, Plus, Trash2, Edit, LayoutGrid, Menu, X } from 'lucide-react';
 import { propertyService, inquiryService, userService, projectService } from '../services/api';
 
-const AdminDashboard: React.FC = () => {
+const AdminDashboard = () => {
   const { logout, user } = useAuth();
   const [activeTab, setActiveTab] = useState('properties');
   const [properties, setProperties] = useState<any[]>([]);

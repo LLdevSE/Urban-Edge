@@ -12,7 +12,7 @@ interface PropertyCardProps {
   type: string;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({ id, title, location, price, size, image, type }) => {
+const PropertyCard = ({ id, title, location, price, size, image, type }: PropertyCardProps) => {
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
       {/* Image Container */}
