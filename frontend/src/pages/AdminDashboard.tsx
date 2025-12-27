@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Building2, Users, LogOut, Plus, Trash2, Edit, LayoutGrid, Menu, X } from 'lucide-react';
+import { Building2, Users, LogOut, Plus, Trash2, Edit, LayoutGrid, Menu, X, Upload } from 'lucide-react';
 import { propertyService, inquiryService, userService, projectService } from '../services/api';
 
 const AdminDashboard = () => {
@@ -20,6 +20,7 @@ const AdminDashboard = () => {
     title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: ['']
   });
   const [selectedPropertyFiles, setSelectedPropertyFiles] = useState<FileList | null>(null);
+  const propertyFileInputRef = useRef<HTMLInputElement>(null);
 
   // Project State
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -28,6 +29,7 @@ const AdminDashboard = () => {
     name: '', location: '', description: '', mainImage: '', status: 'Upcoming'
   });
   const [selectedProjectFile, setSelectedProjectFile] = useState<File | null>(null);
+  const projectFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchData();
@@ -583,35 +585,77 @@ const AdminDashboard = () => {
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-gray-400 uppercase">Property Images</label>
+                  <div 
+                    onClick={() => propertyFileInputRef.current?.click()}
+                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors"
+                  >
+                    <Upload className="text-gray-400 mb-2" size={24} />
+                    <p className="text-sm text-gray-500 font-medium">Click to upload images</p>
+                    <p className="text-xs text-gray-400 mt-1">Supports JPG, PNG, WEBP</p>
+                  </div>
                   <input 
+                    ref={propertyFileInputRef}
                     type="file"
                     multiple
                     accept="image/*"
                     onChange={(e) => setSelectedPropertyFiles(e.target.files)}
-                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    className="hidden" 
                   />
-                  {/* Preview existing images if editing */}
-                  {newProperty.images && newProperty.images.length > 0 && (
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      {newProperty.images.map((img, idx) => (
-                        img && <div key={idx} className="relative">
-                            <img 
-                                src={img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${img}`} 
-                                alt="Preview" 
-                                className="w-16 h-16 object-cover rounded-lg" 
-                            />
-                            <button 
-                                type="button"
-                                onClick={() => {
-                                    const updatedImages = newProperty.images.filter((_, i) => i !== idx);
-                                    setNewProperty({...newProperty, images: updatedImages});
-                                }}
-                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5"
-                            >
-                                <X size={12} />
-                            </button>
+                  
+                  {/* Preview selected NEW files */}
+                  {selectedPropertyFiles && selectedPropertyFiles.length > 0 && (
+                    <div className="flex gap-2 mt-4 flex-wrap">
+                      {Array.from(selectedPropertyFiles).map((file, idx) => (
+                        <div key={idx} className="relative group">
+                          <img 
+                            src={URL.createObjectURL(file)} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded-lg border border-gray-200" 
+                          />
+                          <button
+                             type="button"
+                             onClick={() => {
+                               // Creating a new FileList is tricky, so we might just reset all for simplicity 
+                               // or accept that UI-side single removal from FileList isn't standard HTML behavior.
+                               // Ideally, we'd manage an array of files in state, not just the FileList directly.
+                               // For now, let's allow clearing all.
+                               setSelectedPropertyFiles(null);
+                               if (propertyFileInputRef.current) propertyFileInputRef.current.value = '';
+                             }}
+                             className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                             <X size={10} />
+                          </button>
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Preview existing images if editing */}
+                  {newProperty.images && newProperty.images.length > 0 && (
+                    <div className="mt-4">
+                        <p className="text-xs font-bold text-gray-400 uppercase mb-2">Existing Images</p>
+                        <div className="flex gap-2 flex-wrap">
+                        {newProperty.images.map((img, idx) => (
+                            img && <div key={idx} className="relative group">
+                                <img 
+                                    src={img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${img}`} 
+                                    alt="Preview" 
+                                    className="w-20 h-20 object-cover rounded-lg border border-gray-200" 
+                                />
+                                <button 
+                                    type="button"
+                                    onClick={() => {
+                                        const updatedImages = newProperty.images.filter((_, i) => i !== idx);
+                                        setNewProperty({...newProperty, images: updatedImages});
+                                    }}
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <X size={10} />
+                                </button>
+                            </div>
+                        ))}
+                        </div>
                     </div>
                   )}
                 </div>
@@ -716,19 +760,54 @@ const AdminDashboard = () => {
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-gray-400 uppercase">Main Project Image</label>
+                  <div 
+                    onClick={() => projectFileInputRef.current?.click()}
+                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors"
+                  >
+                    <Upload className="text-gray-400 mb-2" size={24} />
+                    <p className="text-sm text-gray-500 font-medium">Click to upload main image</p>
+                    <p className="text-xs text-gray-400 mt-1">Supports JPG, PNG, WEBP</p>
+                  </div>
                   <input 
+                    ref={projectFileInputRef}
                     type="file"
                     accept="image/*"
                     onChange={(e) => setSelectedProjectFile(e.target.files ? e.target.files[0] : null)}
-                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    className="hidden" 
                   />
+                  
+                  {/* Preview selected NEW file */}
+                  {selectedProjectFile && (
+                    <div className="mt-4 relative group w-max">
+                        <p className="text-xs font-bold text-gray-400 uppercase mb-2">New Image Preview</p>
+                        <div className="relative">
+                            <img 
+                                src={URL.createObjectURL(selectedProjectFile)} 
+                                alt="Preview" 
+                                className="w-24 h-24 object-cover rounded-xl border border-gray-200" 
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSelectedProjectFile(null);
+                                    if (projectFileInputRef.current) projectFileInputRef.current.value = '';
+                                }}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                    </div>
+                  )}
+
+                  {/* Preview existing image if editing */}
                   {newProject.mainImage && !selectedProjectFile && (
-                      <div className="mt-2">
-                          <p className="text-xs text-gray-400 mb-1">Current Image:</p>
+                      <div className="mt-4">
+                          <p className="text-xs font-bold text-gray-400 uppercase mb-2">Current Image</p>
                           <img 
                             src={newProject.mainImage.startsWith('http') ? newProject.mainImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${newProject.mainImage}`}
                             alt="Current" 
-                            className="w-20 h-20 object-cover rounded-lg" 
+                            className="w-24 h-24 object-cover rounded-xl border border-gray-200" 
                           />
                       </div>
                   )}
