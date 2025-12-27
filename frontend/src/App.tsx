@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Navbar from './components/layout/Navbar';
@@ -15,14 +16,18 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import AuthModal from './components/layout/AuthModal';
+import LoadingScreen from './components/layout/LoadingScreen';
 import { AuthProvider } from './hooks/useAuth';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <GoogleOAuthProvider clientId="232020880038-7lttujdnm22glmd4quvps3qnmalqp45l.apps.googleusercontent.com">
       <Router>
         <AuthProvider>
           <ScrollToTop />
+          {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <AuthModal />
