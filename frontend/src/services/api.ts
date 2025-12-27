@@ -21,6 +21,7 @@ export const propertyService = {
   getAll: () => api.get('/properties'),
   getById: (id: string) => api.get(`/properties/${id}`),
   create: (data: any) => api.post('/properties', data),
+  update: (id: string, data: any) => api.put(`/properties/${id}`, data),
   delete: (id: string) => api.delete(`/properties/${id}`),
 };
 

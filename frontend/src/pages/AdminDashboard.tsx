@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Building2, Users, LogOut, Plus, Trash2 } from 'lucide-react';
+import { Building2, Users, LogOut, Plus, Trash2, Edit } from 'lucide-react';
 import { propertyService, inquiryService, userService } from '../services/api';
 
 const AdminDashboard: React.FC = () => {
@@ -13,6 +13,7 @@ const AdminDashboard: React.FC = () => {
   
   // Add Property State
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newProperty, setNewProperty] = useState({
     title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: ['']
   });
@@ -50,6 +51,38 @@ const AdminDashboard: React.FC = () => {
         alert('Failed to delete user');
       }
     }
+  };
+
+  const handleDeleteProperty = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this property?')) {
+      try {
+        await propertyService.delete(id);
+        setProperties(properties.filter(p => p._id !== id));
+      } catch (error) {
+        alert('Failed to delete property');
+      }
+    }
+  };
+
+  const handleEditProperty = (property: any) => {
+    setEditingId(property._id);
+    setNewProperty({
+      title: property.title,
+      description: property.description,
+      price: property.price,
+      location: property.location,
+      size: property.size,
+      type: property.type,
+      status: property.status,
+      images: property.images.length > 0 ? property.images : ['']
+    });
+    setIsPropertyModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsPropertyModalOpen(false);
+    setEditingId(null);
+    setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
   };
 
   return (
@@ -113,7 +146,11 @@ const AdminDashboard: React.FC = () => {
           </h1>
           {activeTab === 'properties' && (
             <button 
-              onClick={() => setIsPropertyModalOpen(true)}
+              onClick={() => {
+                setEditingId(null);
+                setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
+                setIsPropertyModalOpen(true);
+              }}
               className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20"
             >
               <Plus size={20} />
@@ -156,9 +193,20 @@ const AdminDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-6 text-right">
-                        <button className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors">
-                          <Trash2 size={18} />
-                        </button>
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => handleEditProperty(prop)}
+                            className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteProperty(prop._id)}
+                            className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -247,29 +295,34 @@ const AdminDashboard: React.FC = () => {
         )}
       </main>
 
-      {/* Add Property Modal */}
+      {/* Add/Edit Property Modal */}
       {isPropertyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-300">
             <button 
-              onClick={() => setIsPropertyModalOpen(false)}
+              onClick={closeModal}
               className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors z-10"
             >
               <LogOut size={20} className="rotate-180" /> 
             </button>
             
             <div className="p-8">
-              <h2 className="text-2xl font-bold font-montserrat text-primary mb-6">Add New Property</h2>
+              <h2 className="text-2xl font-bold font-montserrat text-primary mb-6">
+                {editingId ? 'Edit Property' : 'Add New Property'}
+              </h2>
               
               <form onSubmit={async (e) => {
                 e.preventDefault();
                 try {
-                  await propertyService.create(newProperty);
-                  setIsPropertyModalOpen(false);
+                  if (editingId) {
+                    await propertyService.update(editingId, newProperty);
+                  } else {
+                    await propertyService.create(newProperty);
+                  }
+                  closeModal();
                   fetchData(); // Refresh list
-                  setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
                 } catch (error) {
-                  alert('Failed to create property');
+                  alert(editingId ? 'Failed to update property' : 'Failed to create property');
                 }
               }} className="space-y-4">
                 
@@ -366,7 +419,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
-                  Create Property
+                  {editingId ? 'Update Property' : 'Create Property'}
                 </button>
               </form>
             </div>
