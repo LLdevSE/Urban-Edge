@@ -1,4 +1,5 @@
 const Property = require('../models/Property');
+const path = require('path');
 
 exports.getProperties = async (req, res) => {
   try {

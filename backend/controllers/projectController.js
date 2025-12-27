@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const path = require('path');
 
 exports.getProjects = async (req, res) => {
   try {

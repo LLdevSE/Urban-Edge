@@ -468,6 +468,18 @@ const AdminDashboard = () => {
                 setIsSubmitting(true);
                 try {
                   const formData = new FormData();
+                  
+                  // Check file sizes
+                  if (selectedPropertyFiles) {
+                    let totalSize = 0;
+                    Array.from(selectedPropertyFiles).forEach(file => totalSize += file.size);
+                    if (totalSize > 4 * 1024 * 1024) {
+                      alert('Total image size exceeds 4MB. Please upload smaller images.');
+                      setIsSubmitting(false);
+                      return;
+                    }
+                  }
+
                   formData.append('title', newProperty.title);
                   formData.append('description', newProperty.description);
                   formData.append('price', newProperty.price);
@@ -497,8 +509,8 @@ const AdminDashboard = () => {
                   }
                   closePropertyModal();
                   fetchData(); // Refresh list
-                } catch (error) {
-                  console.error(error);
+                } catch (error: any) {
+                  console.error('Property Submit Error:', error.response?.data || error.message);
                   alert(editingId ? 'Failed to update property' : 'Failed to create property');
                 } finally {
                   setIsSubmitting(false);
@@ -697,6 +709,13 @@ const AdminDashboard = () => {
                 setIsSubmitting(true);
                 try {
                   const formData = new FormData();
+                  
+                  if (selectedProjectFile && selectedProjectFile.size > 4 * 1024 * 1024) {
+                    alert('Image size exceeds 4MB. Please upload a smaller image.');
+                    setIsSubmitting(false);
+                    return;
+                  }
+
                   formData.append('name', newProject.name);
                   formData.append('location', newProject.location);
                   formData.append('description', newProject.description);
@@ -715,8 +734,8 @@ const AdminDashboard = () => {
                   }
                   closeProjectModal();
                   fetchData(); // Refresh list
-                } catch (error) {
-                  console.error(error);
+                } catch (error: any) {
+                  console.error('Project Submit Error:', error.response?.data || error.message);
                   alert(editingProjectId ? 'Failed to update project' : 'Failed to create project');
                 } finally {
                   setIsSubmitting(false);
