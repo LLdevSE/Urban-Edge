@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-const fs = require('fs');
 
 dotenv.config();
 
@@ -39,7 +38,6 @@ const connectToDatabase = async () => {
   if (!process.env.MONGODB_URI) {
     const msg = 'CRITICAL ERROR: MONGODB_URI is not defined in environment variables.';
     console.error(msg);
-    fs.appendFileSync('error.log', new Date().toISOString() + ' ' + msg + '\n');
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
   }
 
@@ -53,7 +51,6 @@ const connectToDatabase = async () => {
     console.log('MongoDB Connected Successfully');
   } catch (err) {
     console.error('MongoDB Connection Error:', err);
-    fs.appendFileSync('error.log', new Date().toISOString() + ' MongoDB Connection Error: ' + err.message + '\n');
     // Do NOT exit process in serverless; just throw the error so the request fails gracefully-ish
     throw err;
   }
@@ -66,7 +63,6 @@ app.use(async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Database middleware connection failure:', error);
-    fs.appendFileSync('error.log', new Date().toISOString() + ' Database middleware failure: ' + error.message + '\n');
     res.status(500).json({ message: `Database connection failed: ${error.message}`, error: error.message });
   }
 });
