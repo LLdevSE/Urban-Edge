@@ -77,13 +77,15 @@ const Navbar: React.FC = () => {
               </button>
             )}
 
-            <Link
-              to="/contact"
-              className="bg-cta text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
-            >
-              <Phone size={18} />
-              Enquire Now
-            </Link>
+            {(!user || user.role !== 'admin') && (
+              <Link
+                to="/contact"
+                className="bg-cta text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
+              >
+                <Phone size={18} />
+                Enquire Now
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -132,13 +134,15 @@ const Navbar: React.FC = () => {
                 </button>
               </>
             )}
-            <Link
-              to="/contact"
-              className="block px-3 py-2 bg-cta text-white rounded-md font-semibold text-center mt-4"
-              onClick={() => setIsOpen(false)}
-            >
-              Enquire Now
-            </Link>
+            {(!user || user.role !== 'admin') && (
+              <Link
+                to="/contact"
+                className="block px-3 py-2 bg-cta text-white rounded-md font-semibold text-center mt-4"
+                onClick={() => setIsOpen(false)}
+              >
+                Enquire Now
+              </Link>
+            )}
           </div>
         </div>
       )}

@@ -49,7 +49,7 @@ const Properties: React.FC = () => {
 
         {/* Filters Bar */}
         <div className="bg-white p-6 rounded-2xl shadow-sm mb-12 flex flex-wrap items-center gap-6">
-          <div className="flex-grow flex items-center bg-gray-50 border border-gray-100 p-3 rounded-xl min-w-[300px]">
+          <div className="flex-grow flex items-center bg-gray-50 border border-gray-100 p-3 rounded-xl w-full md:min-w-[300px]">
             <Search className="text-gray-400 mr-2" size={20} />
             <input 
               type="text" 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Building2, Users, LogOut, Plus, Trash2, Edit, LayoutGrid } from 'lucide-react';
+import { Building2, Users, LogOut, Plus, Trash2, Edit, LayoutGrid, Menu, X } from 'lucide-react';
 import { propertyService, inquiryService, userService, projectService } from '../services/api';
 
 const AdminDashboard: React.FC = () => {
@@ -11,6 +11,7 @@ const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Property State
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
@@ -126,38 +127,54 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-lightGray">
+    <div className="flex min-h-screen bg-lightGray relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-2xl font-bold text-primary font-montserrat">Urban Edge</h2>
-          <p className="text-xs text-gray-400 mt-1">Admin Panel</p>
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 transform
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-primary font-montserrat">Urban Edge</h2>
+            <p className="text-xs text-gray-400 mt-1">Admin Panel</p>
+          </div>
+          <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-gray-500">
+            <X size={24} />
+          </button>
         </div>
         
         <nav className="flex-grow p-4 space-y-2">
           <button 
-            onClick={() => setActiveTab('properties')}
+            onClick={() => { setActiveTab('properties'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'properties' ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
           >
             <Building2 size={20} />
             Properties
           </button>
           <button 
-            onClick={() => setActiveTab('projects')}
+            onClick={() => { setActiveTab('projects'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'projects' ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
           >
             <LayoutGrid size={20} />
             Projects
           </button>
           <button 
-            onClick={() => setActiveTab('inquiries')}
+            onClick={() => { setActiveTab('inquiries'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'inquiries' ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
           >
             <Users size={20} />
             Inquiries
           </button>
           <button 
-            onClick={() => setActiveTab('users')}
+            onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'users' ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
           >
             <Users size={20} />
@@ -186,9 +203,18 @@ const AdminDashboard: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-grow p-8 overflow-y-auto h-screen">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold font-montserrat text-textDark">
+      <main className="flex-grow p-4 md:p-8 overflow-y-auto h-screen w-full">
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between mb-6">
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 bg-white rounded-lg shadow-sm text-gray-600">
+            <Menu size={24} />
+          </button>
+          <span className="font-bold text-lg text-textDark">Admin Dashboard</span>
+          <div className="w-10"></div> {/* Spacer for centering */}
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold font-montserrat text-textDark">
             {activeTab === 'properties' ? 'Property Management' : activeTab === 'projects' ? 'Project Management' : activeTab === 'inquiries' ? 'Lead Inquiries' : 'Customer Management'}
           </h1>
           {activeTab === 'properties' && (
@@ -198,7 +224,7 @@ const AdminDashboard: React.FC = () => {
                 setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
                 setIsPropertyModalOpen(true);
               }}
-              className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20"
+              className="bg-cta text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20 text-sm md:text-base w-full md:w-auto justify-center"
             >
               <Plus size={20} />
               Add New Property
@@ -211,7 +237,7 @@ const AdminDashboard: React.FC = () => {
                 setNewProject({ name: '', location: '', description: '', mainImage: '', status: 'Upcoming' });
                 setIsProjectModalOpen(true);
               }}
-              className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20"
+              className="bg-cta text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20 text-sm md:text-base w-full md:w-auto justify-center"
             >
               <Plus size={20} />
               Add New Project
@@ -224,7 +250,7 @@ const AdminDashboard: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
             {activeTab === 'properties' ? (
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
