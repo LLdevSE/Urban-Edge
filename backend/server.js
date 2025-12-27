@@ -42,7 +42,8 @@ app.get('/api/health-check', (req, res) => {
     environment: {
       MONGODB_URI: !!process.env.MONGODB_URI,
       JWT_SECRET: !!process.env.JWT_SECRET,
-      GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID
+      GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
+      CLOUDINARY: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET)
     },
     timestamp: new Date().toISOString()
   });

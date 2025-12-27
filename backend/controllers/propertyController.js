@@ -24,7 +24,12 @@ exports.createProperty = async (req, res) => {
   try {
     let images = [];
     if (req.files && req.files.length > 0) {
-      images = req.files.map(file => 'uploads/' + path.basename(file.path)); // Store as uploads/filename
+      images = req.files.map(file => {
+        // If using Cloudinary, path is already a full URL
+        if (file.path.startsWith('http')) return file.path;
+        // Otherwise it's a local path
+        return 'uploads/' + path.basename(file.path);
+      });
     }
     
     // If images are also sent in body (e.g. URLs), merge them
@@ -61,7 +66,10 @@ exports.updateProperty = async (req, res) => {
   try {
     let images = [];
     if (req.files && req.files.length > 0) {
-      images = req.files.map(file => 'uploads/' + path.basename(file.path));
+      images = req.files.map(file => {
+        if (file.path.startsWith('http')) return file.path;
+        return 'uploads/' + path.basename(file.path);
+      });
     }
 
     // If existing images are sent in body, add them
