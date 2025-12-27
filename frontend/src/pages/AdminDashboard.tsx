@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Building2, Users, LogOut, Plus, Trash2, Edit } from 'lucide-react';
-import { propertyService, inquiryService, userService } from '../services/api';
+import { Building2, Users, LogOut, Plus, Trash2, Edit, LayoutGrid } from 'lucide-react';
+import { propertyService, inquiryService, userService, projectService } from '../services/api';
 
 const AdminDashboard: React.FC = () => {
   const { logout, user } = useAuth();
   const [activeTab, setActiveTab] = useState('properties');
   const [properties, setProperties] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Add Property State
+  // Property State
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newProperty, setNewProperty] = useState({
     title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: ['']
+  });
+
+  // Project State
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [newProject, setNewProject] = useState({
+    name: '', location: '', description: '', mainImage: '', status: 'Upcoming'
   });
 
   useEffect(() => {
@@ -28,6 +36,9 @@ const AdminDashboard: React.FC = () => {
       if (activeTab === 'properties') {
         const res = await propertyService.getAll();
         setProperties(res.data);
+      } else if (activeTab === 'projects') {
+        const res = await projectService.getAll();
+        setProjects(res.data);
       } else if (activeTab === 'inquiries') {
         const res = await inquiryService.getAll();
         setInquiries(res.data);
@@ -79,10 +90,39 @@ const AdminDashboard: React.FC = () => {
     setIsPropertyModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closePropertyModal = () => {
     setIsPropertyModalOpen(false);
     setEditingId(null);
     setNewProperty({ title: '', description: '', price: '', location: '', size: '', type: 'Land', status: 'Available', images: [''] });
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        await projectService.delete(id);
+        setProjects(projects.filter(p => p._id !== id));
+      } catch (error) {
+        alert('Failed to delete project');
+      }
+    }
+  };
+
+  const handleEditProject = (project: any) => {
+    setEditingProjectId(project._id);
+    setNewProject({
+      name: project.name,
+      location: project.location,
+      description: project.description,
+      mainImage: project.mainImage,
+      status: project.status
+    });
+    setIsProjectModalOpen(true);
+  };
+
+  const closeProjectModal = () => {
+    setIsProjectModalOpen(false);
+    setEditingProjectId(null);
+    setNewProject({ name: '', location: '', description: '', mainImage: '', status: 'Upcoming' });
   };
 
   return (
@@ -101,6 +141,13 @@ const AdminDashboard: React.FC = () => {
           >
             <Building2 size={20} />
             Properties
+          </button>
+          <button 
+            onClick={() => setActiveTab('projects')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'projects' ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+          >
+            <LayoutGrid size={20} />
+            Projects
           </button>
           <button 
             onClick={() => setActiveTab('inquiries')}
@@ -142,7 +189,7 @@ const AdminDashboard: React.FC = () => {
       <main className="flex-grow p-8 overflow-y-auto h-screen">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold font-montserrat text-textDark">
-            {activeTab === 'properties' ? 'Property Management' : activeTab === 'inquiries' ? 'Lead Inquiries' : 'Customer Management'}
+            {activeTab === 'properties' ? 'Property Management' : activeTab === 'projects' ? 'Project Management' : activeTab === 'inquiries' ? 'Lead Inquiries' : 'Customer Management'}
           </h1>
           {activeTab === 'properties' && (
             <button 
@@ -155,6 +202,19 @@ const AdminDashboard: React.FC = () => {
             >
               <Plus size={20} />
               Add New Property
+            </button>
+          )}
+          {activeTab === 'projects' && (
+            <button 
+              onClick={() => {
+                setEditingProjectId(null);
+                setNewProject({ name: '', location: '', description: '', mainImage: '', status: 'Upcoming' });
+                setIsProjectModalOpen(true);
+              }}
+              className="bg-cta text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20"
+            >
+              <Plus size={20} />
+              Add New Project
             </button>
           )}
         </div>
@@ -202,6 +262,53 @@ const AdminDashboard: React.FC = () => {
                           </button>
                           <button 
                             onClick={() => handleDeleteProperty(prop._id)}
+                            className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : activeTab === 'projects' ? (
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Project Name</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Location</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Status</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase">Total Blocks</th>
+                    <th className="p-6 font-bold text-gray-500 text-sm uppercase text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {projects.map((proj) => (
+                    <tr key={proj._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="p-6">
+                        <div className="flex items-center gap-4">
+                          <img src={proj.mainImage} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                          <span className="font-bold text-textDark">{proj.name}</span>
+                        </div>
+                      </td>
+                      <td className="p-6 text-gray-600">{proj.location}</td>
+                      <td className="p-6">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${proj.status === 'Ongoing' ? 'bg-blue-100 text-blue-700' : proj.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                          {proj.status}
+                        </span>
+                      </td>
+                      <td className="p-6 text-gray-600">{proj.blocks?.length || 0}</td>
+                      <td className="p-6 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => handleEditProject(proj)}
+                            className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteProject(proj._id)}
                             className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
                           >
                             <Trash2 size={18} />
@@ -295,12 +402,12 @@ const AdminDashboard: React.FC = () => {
         )}
       </main>
 
-      {/* Add/Edit Property Modal */}
+      {/* Add Property Modal */}
       {isPropertyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-300">
             <button 
-              onClick={closeModal}
+              onClick={closePropertyModal}
               className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors z-10"
             >
               <LogOut size={20} className="rotate-180" /> 
@@ -319,7 +426,7 @@ const AdminDashboard: React.FC = () => {
                   } else {
                     await propertyService.create(newProperty);
                   }
-                  closeModal();
+                  closePropertyModal();
                   fetchData(); // Refresh list
                 } catch (error) {
                   alert(editingId ? 'Failed to update property' : 'Failed to create property');
@@ -420,6 +527,101 @@ const AdminDashboard: React.FC = () => {
 
                 <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
                   {editingId ? 'Update Property' : 'Create Property'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Project Modal */}
+      {isProjectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-300">
+            <button 
+              onClick={closeProjectModal}
+              className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors z-10"
+            >
+              <LogOut size={20} className="rotate-180" /> 
+            </button>
+            
+            <div className="p-8">
+              <h2 className="text-2xl font-bold font-montserrat text-primary mb-6">
+                {editingProjectId ? 'Edit Project' : 'Add New Project'}
+              </h2>
+              
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  if (editingProjectId) {
+                    await projectService.update(editingProjectId, newProject);
+                  } else {
+                    await projectService.create(newProject);
+                  }
+                  closeProjectModal();
+                  fetchData(); // Refresh list
+                } catch (error) {
+                  alert(editingProjectId ? 'Failed to update project' : 'Failed to create project');
+                }
+              }} className="space-y-4">
+                
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-400 uppercase">Project Name</label>
+                  <input 
+                    required 
+                    value={newProject.name}
+                    onChange={(e) => setNewProject({...newProject, name: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Location</label>
+                    <input 
+                      required 
+                      value={newProject.location}
+                      onChange={(e) => setNewProject({...newProject, location: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Status</label>
+                    <select 
+                      value={newProject.status}
+                      onChange={(e) => setNewProject({...newProject, status: e.target.value})}
+                      className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none"
+                    >
+                      <option value="Upcoming">Upcoming</option>
+                      <option value="Ongoing">Ongoing</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-400 uppercase">Description</label>
+                  <textarea 
+                    required 
+                    rows={3}
+                    value={newProject.description}
+                    onChange={(e) => setNewProject({...newProject, description: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-400 uppercase">Main Image URL</label>
+                  <input 
+                    value={newProject.mainImage}
+                    onChange={(e) => setNewProject({...newProject, mainImage: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-cta focus:outline-none" 
+                    placeholder="https://example.com/project-image.jpg"
+                  />
+                </div>
+
+                <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg mt-4">
+                  {editingProjectId ? 'Update Project' : 'Create Project'}
                 </button>
               </form>
             </div>
